@@ -1,0 +1,19 @@
+{
+  "name": "hackthefuture",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mocrosoft",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "ejs": "^2.5.5",
+    "express": "^4.14.0",
+    "nodemon": "^1.11.0",
+    "request": "^2.79.0",
+    "socket.io": "^1.7.1"
+  }
+}

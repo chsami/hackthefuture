@@ -1,0 +1,129 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<title>Cupid Dashboard</title>
+		<!--fonts-->
+		<link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono" rel="stylesheet">
+		<!--icons-->
+		<link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicon-96x96.png">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<!--CDN css-->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+		<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+		<!-- LOCAL css-->
+		<link rel="stylesheet" href="/css/style.css">
+	</head>
+<body>
+	<div class="page-top clearfix">
+		<a class="logo">Admin</a>
+		<a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+		<div class="search">
+			<i class="material-icons prefix">search</i>
+			<input placeholder="Search for..." type="text">
+		</div>
+		<div class="userprofile clearfix">
+				<ul class="msg-center clearfix">
+				<li>
+					<a>
+						Notification
+						<span>5</span>
+						<div class="notification-ring"></div>
+					</a>
+				</li>
+					
+				</ul>
+			</div>
+		<div class="question-section">
+			Have questions?
+			<a href="mailto:sami.c@hotmail.be">sami.c@hotmail.be</a>
+		</div>
+	</div>
+	
+	<div class="content">
+		<div class="small-container">
+			<div class="panel w3-animate-zoom">
+				<div class="data-container">
+				  <div class="data-left w3-col s6"><p>Cabin Degree</p></div>
+				  <div class="data-right w3-col s6"><p class="display-text-warning" >30 C°</p></div>
+				</div>
+			</div>
+		</div>
+		<div class="small-container">
+			<div class="panel w3-animate-zoom">
+				<div class="data-container">
+				  <div class="data-left w3-col s6"><p>Location</p></div>
+				  <div class="data-right w3-col s6"><p>long: 1.144</p><p>latt: 1.3344</p></div>
+				</div>
+			</div>
+		</div>
+		<div class="small-container">
+			<div class="panel w3-animate-zoom">
+				<div class="data-container">
+				  <div class="data-left w3-col s6"><p>Humidity</p></div>
+				  <div class="data-right w3-col s6"><p class="display-text-danger">High</p></div>
+				</div>
+			</div>
+		</div>
+		<div class="large-container">
+			<div class="panel w3-animate-zoom">
+				<div class="data-container">
+				  <div class="data-left w3-col s6"><p>Humidity</p></div>
+				  <div class="data-right w3-col s6"><p class="display-text-danger"><%= chance %></p></div>
+				</div>
+			</div>
+			<div class="panel w3-animate-zoom">
+				<div class="data-container">
+				  <div class="data-left w3-col s6"><p>Humidity</p></div>
+				  <div class="data-right w3-col s6"><p class="display-text-danger">High</p></div>
+				</div>
+			</div>
+		</div>
+	</div>
+		
+	<ul id="slide-out" class="side-nav">
+		<li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
+		<li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
+		<li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
+	</ul>
+ 
+	<!--script-->
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	<script>
+		$(function(){ 
+			
+			$('.button-collapse').sideNav({
+			  menuWidth: 300, // Default is 240
+			  edge: 'left', // Choose the horizontal origin
+			  closeOnClick: false, // Closes side-nav on <a> clicks, useful for Angular/Meteor
+			  draggable: true // Choose whether you can drag to open on touch screens
+			});
+			$('.panel > .data-container > .data-left').each(function() {
+				var random = Math.random() * 1;
+				$(this).css('-webkit-animation', 'tear ' + random  + 's linear');
+				$(this).css('animation',  'tear ' + random + 's linear');
+				$(this).css('-webkit-animation-iteration-count', 'infinite');
+				$(this).css('animation-iteration-count', 'infinite');
+			});
+			
+			var socket = io.connect();
+			
+			/*setInterval(function() {
+				socket.emit('send2server', 'hello from the client.');
+			}, 1000);*/
+			
+			
+			socket.on('send2client', function(data) {
+				console.log(data);
+			});
+		});
+	</script>
+</body>
+</html>
