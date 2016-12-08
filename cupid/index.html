@@ -24,15 +24,15 @@
 		<a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
 		<div class="search">
 			<i class="material-icons prefix">search</i>
-			<input placeholder="Search for..." type="text">
+			<input id="search" placeholder="Search for..." type="text">
 		</div>
 		<div class="userprofile clearfix">
 				<ul class="msg-center clearfix">
 				<li>
 					<a>
-						Notification
-						<span>5</span>
-						<div class="notification-ring"></div>
+						
+						<!--<span></span>-->
+						<!--<div class="notification-ring"></div>-->
 					</a>
 				</li>
 					
@@ -40,56 +40,21 @@
 			</div>
 		<div class="question-section">
 			Have questions?
-			<a href="mailto:sami.c@hotmail.be">sami.c@hotmail.be</a>
+			<!--<a href="mailto:sami.c@hotmail.be"></a>-->
 		</div>
 	</div>
 	
-	<div class="content">
-		<div class="small-container">
-			<div class="panel w3-animate-zoom">
-				<div class="data-container">
-				  <div class="data-left w3-col s6"><p>Cabin Degree</p></div>
-				  <div class="data-right w3-col s6"><p class="display-text-warning" >30 C°</p></div>
-				</div>
-			</div>
-		</div>
-		<div class="small-container">
-			<div class="panel w3-animate-zoom">
-				<div class="data-container">
-				  <div class="data-left w3-col s6"><p>Location</p></div>
-				  <div class="data-right w3-col s6"><p>long: 1.144</p><p>latt: 1.3344</p></div>
-				</div>
-			</div>
-		</div>
-		<div class="small-container">
-			<div class="panel w3-animate-zoom">
-				<div class="data-container">
-				  <div class="data-left w3-col s6"><p>Humidity</p></div>
-				  <div class="data-right w3-col s6"><p class="display-text-danger">High</p></div>
-				</div>
-			</div>
-		</div>
-		<div class="large-container">
-			<div class="panel w3-animate-zoom">
-				<div class="data-container">
-				  <div class="data-left w3-col s6"><p>Humidity</p></div>
-				  <div class="data-right w3-col s6"><p class="display-text-danger"><%= chance %></p></div>
-				</div>
-			</div>
-			<div class="panel w3-animate-zoom">
-				<div class="data-container">
-				  <div class="data-left w3-col s6"><p>Humidity</p></div>
-				  <div class="data-right w3-col s6"><p class="display-text-danger">High</p></div>
-				</div>
-			</div>
-		</div>
+	<div class="content" >
+
 	</div>
 		
 	<ul id="slide-out" class="side-nav">
-		<li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
-		<li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
-		<li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
+		<li><a id="displayPanels" href="#!"><i class="material-icons">perm_identity</i>Rovers display</a></li>
+		<li><a id="displayMap" href="#!"><i class="material-icons">language</i>World map</a></li>
 	</ul>
+	
+	<canvas id="map" class="w3-animate-zoom" width="400" height="400" style="border: 4px solid #3cd4d0">
+	</canvas>
  
 	<!--script-->
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
@@ -98,31 +63,338 @@
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 	<script>
 		$(function(){ 
+		
+			var corruptRobots = [];
+			var canvas =document.getElementById("map");
+			var ctx = canvas.getContext("2d");
+			var water = 0;
+			var highestTemp = 0;
+			var lowestTemp = 0;
 			
-			$('.button-collapse').sideNav({
-			  menuWidth: 300, // Default is 240
-			  edge: 'left', // Choose the horizontal origin
-			  closeOnClick: false, // Closes side-nav on <a> clicks, useful for Angular/Meteor
-			  draggable: true // Choose whether you can drag to open on touch screens
-			});
-			$('.panel > .data-container > .data-left').each(function() {
-				var random = Math.random() * 1;
-				$(this).css('-webkit-animation', 'tear ' + random  + 's linear');
-				$(this).css('animation',  'tear ' + random + 's linear');
-				$(this).css('-webkit-animation-iteration-count', 'infinite');
-				$(this).css('animation-iteration-count', 'infinite');
+			
+			displayMap(false);
+			
+			loadAllRobots(true, process());
+			
+			function process() {
+				setInterval(function() {
+					loadAllRobots(false,null);
+				}, 5000);
+			}
+			
+			
+			
+			
+			
+			
+			
+			function loadAllRobots(firstLoad, callback) {
+				$.ajax({
+					type: "GET",
+					url: 'https://roguerovers-api-develop.azurewebsites.net/api/channel/',
+					//data: data,
+					success: function(msg) {
+						console.log("done");
+						loadRobotDetails(msg, firstLoad);
+					},
+					error: function (msg) {
+						console.log(msg);
+					},
+					//dataType: dataType
+					dataType: "json"
+				});
+				if (callback != null)
+					callback();
+			}
+			
+			
+			function initPanels(robots) {
+				for(var i = 0; i < robots.length; i++) {
+						$(".content").append('<div class="small-container"> \
+												<div class="panel w3-animate-zoom" id=' + robots[i] + '> \
+													<div class="data-container"> \
+														<div class="data-left w3-col s6"><p>' + robots[i] + '</p></div> \
+														<div class="data-right w3-col s6"><ul class="robotInformation"></ul></div> \
+													</div> \
+												</div> \
+											</div>');
+				};
+				$('.button-collapse').sideNav({
+				  menuWidth: 300, // Default is 240
+				  edge: 'left', // Choose the horizontal origin
+				  closeOnClick: false, // Closes side-nav on <a> clicks, useful for Angular/Meteor
+				  draggable: true // Choose whether you can drag to open on touch screens
+				});
+				$('.panel > .data-container > .data-left').each(function() {
+					/*var random = Math.random() * 1;
+					$(this).css('-webkit-animation', 'tear ' + random  + 's linear');
+					$(this).css('animation',  'tear ' + random + 's linear');
+					$(this).css('-webkit-animation-iteration-count', 'infinite');
+					$(this).css('animation-iteration-count', 'infinite');*/
+				});
+			}
+			
+			
+			function loadRobotDetails(robots, firstLoad) {
+				if (firstLoad === true)
+					initPanels(robots);
+				$('.robotInformation').each(function () {
+					var list = $(this);
+					var panel = list.parent().parent().parent();
+					var id = panel.attr('id');
+					callRobotDetail(id, list, panel, firstLoad);
+					/*if (corruptRobots.length > 0) {
+						for(var i =0; i < corruptRobots.length; i++) {
+							if (id == corruptRobots[i]) {
+								continue;
+							} else {
+								callRobotDetail(id, list, panel, firstLoad);
+							}
+						}
+					}  else {
+						callRobotDetail(id, list, panel, firstLoad);
+					}*/
+				});
+			}
+			
+			function callRobotDetail(id, list, panel, firstLoad) {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				var imageObj = new Image();
+				imageObj.src = 'assets/img/base.png';
+				imageObj.onload = function() {
+					ctx.drawImage(imageObj, 200, 200);
+				};
+				$.ajax({
+						type: "GET",
+						url: 'https://roguerovers-api-develop.azurewebsites.net/api/channel/' + id,
+						success: function(msg) {
+							list.empty();
+							list.replaceWith('<ul class="robotInformation"><li>Name:' + msg['name']  + '</li> \
+										<li>X:' + msg['position']['x'] + ' Y:' + msg['position']['y']  + '</li> \
+										<li>Direction:' + msg['direction']  + '</li> \
+										<li>Speed:' + msg['speed']  + '</li></ul>');
+							var imageObj = new Image();
+							imageObj.src = 'assets/img/rover.png';
+							imageObj.onload = function() {
+								ctx.drawImage(imageObj, msg['position']['x'],msg['position']['y']);
+							};
+						},
+						error: function (msg) {
+							//panel.remove();
+							console.log("ERRROOR");
+						},
+						complete: function(e, xhr, settings) {
+							if(e.status === 400){
+								panel.parent().remove();
+								if (firstLoad === true) //fill the list with corrupted robots
+									corruptRobots.push(id);
+							}
+							
+						},
+						//dataType: dataType
+						dataType: "json"
+				});
+				
+				$.ajax({
+						type: "GET",
+						url: 'https://roguerovers-api-develop.azurewebsites.net/api/channel/' + id + '/sensor/t1',
+						success: function(msg) {
+							if (highestTemp == 0) {
+								highestTemp = msg;
+								$('.data-container').attr('Htemp', msg);
+							} else if (msg > highestTemp) {
+								highestTemp = msg;
+								$('.data-container').attr('Htemp', msg);
+							}
+							panel.animate({
+									borderWidth: 4,
+								}, 100);
+								panel.animate({
+									borderWidth: 1,
+								}, 200);
+							if (lowestTemp == 0) {
+								lowestTemp = msg;
+								$('.data-container').attr('Ltemp', msg);
+							} else if (msg < lowestTemp) {
+								lowestTemp = msg;
+								$('.data-container').attr('Ltemp', msg);
+							}
+							$('.data-container').attr('temp', msg);
+							$('.data-container').find('.robotInformation > .temp').empty();
+							$('.data-container').find('.robotInformation').append('<li class="temp" style="list-style:none">Temperature:' + msg.toFixed(2) + 'C°</li>');
+							$('.data-container').find('.robotInformation > .Htemp').empty();
+							$('.data-container').find('.robotInformation').append('<li class="Htemp">H: ' + highestTemp.toFixed(2) + 'C°<li>');
+							$('.data-container').find('.robotInformation > .Ltemp').empty();
+							$('.data-container').find('.robotInformation').append('<li class="Ltemp">L: ' + lowestTemp.toFixed(2) + 'C°</li>');
+							/*panel.animate({
+								borderWidth: 4
+							}, 100);
+							panel.animate({
+								borderWidth: 0
+							}, 200);*/
+							//panel.hide().fadeIn();
+						},
+						error: function (msg) {
+							//panel.remove();
+							console.log("ERRROOR");
+						},
+						//dataType: dataType
+						dataType: "json"
+				});
+				
+				$.ajax({
+						type: "GET",
+						url: 'https://roguerovers-api-develop.azurewebsites.net/api/channel/' + id + '/sensor/w1',
+						success: function(msg) {
+							if (water == 0) {
+								highestWater = msg;
+							} else if (msg > 0) {
+								water = msg; //found water
+								//$('.data-container').find('.robotInformation').append('<li class="water">FOUND WATER!</li>');
+								panel.css('-webkit-animation', 'alert 2s linear');
+								panel.css('animation',  'alert 2s linear');
+								panel.css('-webkit-animation-iteration-count', '');
+								panel.css('animation-iteration-count', '');
+							}
+							$('.data-container').attr('water', msg);
+							/*panel.animate({
+								borderWidth: 4
+							}, 100);
+							panel.animate({
+								borderWidth: 0
+							}, 200);*/
+							//panel.hide().fadeIn();
+						},
+						error: function (msg) {
+							//panel.remove();
+							console.log("ERRROOR");
+						},
+						//dataType: dataType
+						dataType: "json"
+				});
+				
+			}
+			
+			$('#displayMap').on('click', function(e) {
+				displayPanels(false);
+				displayMap(true);
+				e.preventDefault();
 			});
 			
-			var socket = io.connect();
+			$('#displayPanels').on('click', function(e) {
+				displayPanels(true);
+				displayMap(false);
+				e.preventDefault();
+			});
+			
+			function displayPanels(display) {
+				$('.panel').each(function() {
+					if (!display) {
+						$(this).hide();
+					} else {
+						$(this).show();
+					}
+				});
+			}
+			
+			function displayMap(display) {
+				if (!display)
+					$('#map').hide();
+				else
+					$('#map').show();
+			}
+			
+			liveFilter();
+			function liveFilter() {
+			$( "#search" ).keyup(function() {
+				executeFilter($(this).val());
+			});
+			$( "#search" ).keyup(function() {
+				if ($(this).val() == '')
+					executeFilter('', '');
+				});
+			}
+
+			function executeFilter(input) {
+				$('.panel').each(function() {
+					var text = $(this).find('.data-right > ul > li').first().text();
+					var filteredText = text.substring(5, text.length);
+					if (!$(this).css('display') != 'block' && (input == '' || filteredText.toLowerCase().indexOf(input.toLowerCase()) >= 0)) {
+						$(this).show();
+					} else {
+						$(this).hide();
+						//console.log('input : ' + input + ' - text :  ' + $(this).find('.songArtist').text() + ' = ' + $(this).find('.songArtist').text().indexOf(input));
+					}
+				});
+			}
+			
+			
+			/*function draw() {
+
+			  ctx.clearRect(0, 0, canvas.width, canvas.height);
+			  
+			  ctx.translate(120, 120);
+			  
+			  ctx.rotate(0.05);
+			  
+			  for (var i = 50; i < 150; i += 25) {
+				ctx.beginPath();
+				ctx.strokeStyle = 'rgb(10,100,10)';
+				ctx.setLineDash([2, 2]);
+				ctx.arc(0,0,i,0,Math.PI*2,true);
+				ctx.stroke();
+			  }
+			  
+			  for (var i = 0; i < 80; i += 10) {
+				ctx.fillStyle = "green";
+				ctx.fillRect(i, i, 10, 10); 
+			  }
+			  
+			  ctx.translate(-120, -120);
+			  
+			  window.requestAnimationFrame(draw);
+			}
+			
+			
+			
+			window.requestAnimationFrame(draw);*/
+			
+			
+			//GARBAGE
+			
+							/*panel.mouseenter(function () {
+					$.ajax({
+						type: "GET",
+						url: 'https://roguerovers-api-develop.azurewebsites.net/api/channel/' + id,
+						//data: data,
+						success: function(msg) {
+							list.empty();
+							list.append('<li>Name:' + msg['name']  + '</li> \
+										<li>X:' + msg['position']['x'] + ' Y:' + msg['position']['y']  + '</li> \
+										<li>Direction:' + msg['direction']  + '</li> \
+										<li>Speed:' + msg['speed']  + '</li>').hide().fadeIn();
+							console.log(msg);
+						},
+						error: function (msg) {
+							
+						},
+						//dataType: dataType
+						dataType: "json"
+					});
+				});
+				panel.mouseleave(function() {
+					list.empty();
+				});*/
+			//var socket = io.connect();
 			
 			/*setInterval(function() {
 				socket.emit('send2server', 'hello from the client.');
 			}, 1000);*/
 			
 			
-			socket.on('send2client', function(data) {
+			/*socket.on('send2client', function(data) {
 				console.log(data);
-			});
+			});*/
 		});
 	</script>
 </body>

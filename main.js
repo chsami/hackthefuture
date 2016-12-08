@@ -75,23 +75,38 @@ app.use((request, response, next) => {
 });
 
 app.get('/', (req, res) => {
-	request('http://api.rsbuddy.com/grandExchange?a=guidePrice&i=2434&i=4151', function (error, response, body) {
+	/*request('https://roguerovers-api-develop.azurewebsites.net/api/channel', function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-			var json = JSON.parse(body);
-			var first = json[Object.keys(json)[1]];
+			var robotJson = JSON.parse(body);
+			//console.log(json[0]);
+			for (var i = 0; i < robotJson.length; i++) {
+				request('https://roguerovers-api-develop.azurewebsites.net/api/channel/' + robotJson[i], function (error, response, body) {
+					if (!error && response.statusCode == 200) {
+						var robotDetailJson = JSON.parse(body);
+						
+					}
+				});
+			}
+			//var first = json[Object.keys(json)[1]];
+			//console.log(first['overall']);
+			//req.chance = first['overall'];
+			//console.log(json);
+			
+			/*var first = json[Object.keys(json)[1]];
 			console.log(first['overall']);
 			req.chance = first['overall'];
 		}
-		fs.readFile('cupid/index.html', 'utf-8', function (err, content) {
-			if (err) {
-				response.end('error occurred');
-				return;
-			}
-			var renderedHtml = ejs.render(content, {
-					chance: req.chance
-				}); //get redered HTML code
-			res.end(renderedHtml);
-		});
+	});*/
+	
+	fs.readFile('cupid/index.html', 'utf-8', function (err, content) {
+		if (err) {
+			response.end('error occurred');
+			return;
+		}
+		var renderedHtml = ejs.render(content, {
+				
+		}); //get redered HTML code
+		res.end(renderedHtml);
 	});
 });
 
