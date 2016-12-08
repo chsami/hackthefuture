@@ -1,0 +1,4 @@
+use Mars
+db.createCollection("Rover");
+db.createCollection("Temp");
+db.createCollection("Water");
